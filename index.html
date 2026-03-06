@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Naturalización Mexicana</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        :root{--mx:#006341;--mx-r:#ce1126;--mx-dk:#004d32}
+        body{background:#f5f5f5}
+        .sub{font-size:.72em;color:#999;font-style:italic;display:block;line-height:1.3}
+        .sub:empty{display:none}
+        .hero{background:linear-gradient(135deg,var(--mx),var(--mx-r));color:#fff;padding:2.5rem 0}
+        .hero .sub{color:rgba(255,255,255,.55)}
+        .btn-mx{background:var(--mx);border-color:var(--mx);color:#fff}
+        .btn-mx:hover,.btn-mx:focus{background:var(--mx-dk);border-color:var(--mx-dk);color:#fff}
+        .btn-mx .sub{color:rgba(255,255,255,.65)}
+        .btn-mx-outline{border:2px solid var(--mx);color:var(--mx);background:#fff}
+        .btn-mx-outline:hover{background:var(--mx);color:#fff}
+        .opt-btn{text-align:left;padding:.75rem 1.25rem;border:2px solid #dee2e6;border-radius:.5rem;transition:.15s;cursor:pointer;background:#fff}
+        .opt-btn:hover:not(:disabled){border-color:var(--mx);background:#f0faf5}
+        .opt-btn.correct{border-color:#198754;background:#d1e7dd;color:#0a3622;font-weight:600}
+        .opt-btn.wrong{border-color:#dc3545;background:#f8d7da;color:#58151c}
+        .opt-btn:disabled{cursor:default;opacity:1}
+        .exam-grid .btn{min-width:54px}
+        .progress{height:22px}
+        .card{border:none;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .nav-pills .nav-link.active{background:var(--mx)}
+        .nav-pills .nav-link{color:var(--mx)}
+        .guide-table{width:100%}
+        .guide-table td,.guide-table th{padding:.4rem .75rem;border:1px solid #dee2e6}
+        footer{background:#343a40;color:#fff;padding:1.5rem 0;margin-top:3rem}
+        footer .sub{color:rgba(255,255,255,.4)}
+        .form-check-input:checked{background-color:var(--mx);border-color:var(--mx)}
+        .lang-toggle{font-size:.8rem;cursor:pointer;user-select:none}
+        .lang-toggle span{padding:2px 7px;border-radius:3px}
+        .lang-toggle .active{background:rgba(255,255,255,.2);font-weight:600}
+        .timer-bar{height:6px;background:#dee2e6;border-radius:3px;overflow:hidden;margin-bottom:1rem}
+        .timer-bar .timer-fill{height:100%;background:var(--mx);transition:width .25s linear}
+        .timer-bar .timer-fill.warn{background:#ffc107}
+        .timer-bar .timer-fill.danger{background:#dc3545}
+        .flashcard{min-height:220px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .3s,box-shadow .3s;user-select:none}
+        .flashcard:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12)!important}
+        .flashcard .reveal-hint{font-size:.85rem;color:#999;margin-top:1rem}
+        .flashcard .answer-text{color:var(--mx);font-weight:600}
+        .mode-btn{border:2px solid #dee2e6;border-radius:.75rem;padding:1rem;text-align:center;transition:.2s;cursor:pointer;background:#fff}
+        .mode-btn:hover{border-color:var(--mx);background:#f0faf5}
+        .mode-btn i{font-size:1.5rem;color:var(--mx);display:block;margin-bottom:.5rem}
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#" onclick="showHome();return false"><i class="fas fa-flag me-2"></i>Naturalización MX</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto me-3">
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showHome();return false">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showGuide();return false">Guía de Estudio</a></li>
+            </ul>
+            <div class="lang-toggle text-white" id="langToggle">
+                <span onclick="setLang('none')" data-l="none" class="active">ES</span>
+                <span onclick="setLang('en')" data-l="en">EN</span>
+                <span onclick="setLang('cs')" data-l="cs">CZ</span>
+                <span onclick="setLang('de')" data-l="de">DE</span>
+                <span onclick="setLang('it')" data-l="it">IT</span>
+                <span onclick="setLang('pt')" data-l="pt">PT</span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- HOME -->
+<div id="homeScreen">
+    <section class="hero text-center">
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-1">Examen de Naturalización Mexicana</h1>
+            <span class="sub" data-en="Mexican Naturalization Exam Practice" data-cs="Praxe na zkoušku mexické naturalizace" data-de="Übungsprüfung zur mexikanischen Einbürgerung" data-it="Pratica per l'esame di naturalizzazione messicana" data-pt="Prática para o exame de naturalização mexicana"></span>
+            <p class="lead mt-2 mb-0">Practica con 83 exámenes reales.</p>
+            <span class="sub" data-en="Practice with 83 real exams." data-cs="Procvičuj s 83 skutečnými zkouškami." data-de="Übe mit 83 echten Prüfungen." data-it="Esercitati con 83 esami reali." data-pt="Pratique com 83 exames reais."></span>
+        </div>
+    </section>
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card p-4 mb-4">
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <button class="btn btn-mx btn-lg w-100 py-3" onclick="startAllExams()">
+                                <i class="fas fa-layer-group me-2"></i>Todos los Exámenes<br>
+                                <span class="sub" data-en="All exams · 830 questions" data-cs="Všechny zkoušky · 830 otázek" data-de="Alle Prüfungen · 830 Fragen" data-it="Tutti gli esami · 830 domande" data-pt="Todos os exames · 830 perguntas"></span>
+                            </button>
+                        </div>
+                        <div class="col-sm-6">
+                            <button class="btn btn-mx btn-lg w-100 py-3" onclick="startRandomExam()">
+                                <i class="fas fa-shuffle me-2"></i>Examen Aleatorio<br>
+                                <span class="sub" data-en="Random exam · 10 questions" data-cs="Náhodná zkouška · 10 otázek" data-de="Zufällige Prüfung · 10 Fragen" data-it="Esame casuale · 10 domande" data-pt="Exame aleatório · 10 perguntas"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Learning modes -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-4">
+                            <div class="mode-btn" onclick="startFlashcards()">
+                                <i class="fas fa-clone"></i>
+                                <strong>Tarjetas</strong><br>
+                                <span class="sub" data-en="Flashcards" data-cs="Kartičky" data-de="Karteikarten" data-it="Schede" data-pt="Cartões"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mode-btn" onclick="startTimedQuiz()">
+                                <i class="fas fa-stopwatch"></i>
+                                <strong>Contrarreloj</strong><br>
+                                <span class="sub" data-en="Timed Quiz" data-cs="Na čas" data-de="Zeitquiz" data-it="A tempo" data-pt="Cronometrado"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="mode-btn" onclick="startMistakesOnly()">
+                                <i class="fas fa-rotate-left"></i>
+                                <strong>Solo Errores</strong><br>
+                                <span class="sub" data-en="Mistakes Only" data-cs="Jen chyby" data-de="Nur Fehler" data-it="Solo errori" data-pt="Só erros"></span>
+                                <small class="text-muted d-block" id="mistakeCount"></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="rehearsalToggle">
+                        <label class="form-check-label" for="rehearsalToggle">
+                            Modo Refuerzo
+                            <span class="sub" data-en="Rehearsal — repeats wrong answers (max 2 retries)" data-cs="Opakování — špatné odpovědi se zopakují (max 2×)" data-de="Wiederholung — falsche Antworten werden wiederholt (max 2×)" data-it="Ripasso — ripete le risposte sbagliate (max 2 tentativi)" data-pt="Reforço — repete respostas erradas (máx. 2 tentativas)"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="card p-4">
+                    <h5 class="mb-1">Elige un examen</h5>
+                    <span class="sub mb-3" data-en="Choose an exam" data-cs="Vyber zkoušku" data-de="Wähle eine Prüfung" data-it="Scegli un esame" data-pt="Escolha um exame"></span>
+                    <div class="exam-grid d-flex flex-wrap gap-2" id="examGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quizScreen" style="display:none">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h5 class="mb-0" id="quizTitle"></h5>
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                        <span class="badge bg-success" id="badgeCorrect">0</span>
+                        <span class="badge bg-danger" id="badgeWrong">0</span>
+                        <span class="badge bg-warning text-dark" id="badgeRetries" style="display:none">0</span>
+                        <span class="badge bg-secondary" id="badgeTimer" style="display:none">30s</span>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="confirmExit()"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div id="timerBarWrap" style="display:none"><div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>
+                <div class="progress mb-3">
+                    <div class="progress-bar bg-success" id="progressBar" style="width:0%"><span id="progressText">0%</span></div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <span>Pregunta <span id="qNum">1</span> / <span id="qTotal">10</span></span>
+                        <span id="retryBadge" class="badge bg-warning text-dark" style="display:none">Repaso</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="mb-1" id="qText"></h5>
+                        <span class="sub mb-3" id="qTextSub"></span>
+                        <div class="d-grid gap-2" id="opts"></div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-mx btn-lg" id="nextBtn" style="display:none" onclick="nextQuestion()">
+                        Siguiente <span class="sub" data-en="Next" data-cs="Další" data-de="Weiter" data-it="Avanti" data-pt="Próxima" style="display:inline;margin-left:4px"></span> <i class="fas fa-arrow-right ms-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FLASHCARD -->
+<div id="flashcardScreen" style="display:none">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h5 class="mb-0" id="fcTitle">Tarjetas</h5>
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="badge bg-primary" id="fcProgress">1/10</span>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="showHome()"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="progress mb-3"><div class="progress-bar bg-success" id="fcBar" style="width:0%"></div></div>
+                <div class="card flashcard p-4" id="fcCard" onclick="fcReveal()">
+                    <h5 class="text-center mb-1" id="fcQuestion"></h5>
+                    <span class="sub text-center" id="fcQuestionSub"></span>
+                    <div id="fcAnswer" style="display:none" class="mt-3 text-center">
+                        <hr>
+                        <p class="answer-text fs-5 mb-1" id="fcAnswerText"></p>
+                        <span class="sub" id="fcAnswerSub"></span>
+                    </div>
+                    <div class="reveal-hint" id="fcHint"><i class="fas fa-hand-pointer me-1"></i>Toca para ver la respuesta
+                        <span class="sub" data-en="Tap to reveal answer" data-cs="Klepni pro odpověď" data-de="Tippen für Antwort" data-it="Tocca per la risposta" data-pt="Toque para ver a resposta"></span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <button class="btn btn-outline-danger" id="fcWrong" style="display:none" onclick="fcNext(false)"><i class="fas fa-times me-1"></i>No sabía</button>
+                    <button class="btn btn-outline-success" id="fcRight" style="display:none" onclick="fcNext(true)"><i class="fas fa-check me-1"></i>Sabía</button>
+                </div>
+                <div class="text-center mt-3" id="fcDone" style="display:none">
+                    <div class="card p-4 text-center">
+                        <h4>Completado!</h4>
+                        <p id="fcScore"></p>
+                        <button class="btn btn-mx" onclick="showHome()"><i class="fas fa-home me-2"></i>Inicio</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RESULTS -->
+<div id="resultsScreen" style="display:none">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card text-center p-4 mb-4">
+                    <h2 class="mb-2"><i class="fas fa-trophy text-warning me-2"></i>Resultados</h2>
+                    <span class="sub" data-en="Results" data-cs="Výsledky" data-de="Ergebnisse" data-it="Risultati" data-pt="Resultados"></span>
+                    <div class="display-3 fw-bold my-2" id="finalScore">0/10</div>
+                    <p class="lead mb-4" id="resultMsg"></p>
+                    <div class="row text-center mb-4">
+                        <div class="col-4"><div class="fs-3 fw-bold text-success" id="rCorrect">0</div><small class="text-muted">Correctas<br><span class="sub" data-en="Correct" data-cs="Správně" data-de="Richtig" data-it="Corrette" data-pt="Corretas"></span></small></div>
+                        <div class="col-4"><div class="fs-3 fw-bold text-danger" id="rWrong">0</div><small class="text-muted">Errores<br><span class="sub" data-en="Wrong" data-cs="Špatně" data-de="Falsch" data-it="Errori" data-pt="Erros"></span></small></div>
+                        <div class="col-4"><div class="fs-3 fw-bold text-primary" id="rPct">0%</div><small class="text-muted">Porcentaje<br><span class="sub" data-en="Percentage" data-cs="Procenta" data-de="Prozent" data-it="Percentuale" data-pt="Porcentagem"></span></small></div>
+                    </div>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <button class="btn btn-mx btn-lg" onclick="restartCurrent()"><i class="fas fa-redo me-2"></i>Reintentar</button>
+                        <button class="btn btn-outline-secondary btn-lg" onclick="showHome()"><i class="fas fa-home me-2"></i>Inicio</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Revisión <span class="sub" data-en="Answer Review" data-cs="Přehled odpovědí" data-de="Antwortübersicht" data-it="Revisione risposte" data-pt="Revisão de respostas" style="display:inline;color:rgba(255,255,255,.6);margin-left:4px"></span></h5>
+                    </div>
+                    <div class="card-body" id="reviewContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GUIDE -->
+<div id="guideScreen" style="display:none">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-lg-3 mb-3">
+                <div class="card p-3">
+                    <h6 class="text-muted mb-2">Secciones <span class="sub" data-en="Sections" data-cs="Sekce" data-de="Abschnitte" data-it="Sezioni" data-pt="Seções"></span></h6>
+                    <ul class="nav nav-pills flex-column" id="guideTabs"></ul>
+                </div>
+                <button class="btn btn-mx w-100 mt-3" onclick="showHome()"><i class="fas fa-arrow-left me-2"></i>Volver</button>
+            </div>
+            <div class="col-lg-9">
+                <div class="card p-4" id="guideContent">
+                    <p class="text-muted">Selecciona una sección.<br><span class="sub" data-en="Select a section." data-cs="Vyber sekci." data-de="Wähle einen Abschnitt." data-it="Seleziona una sezione." data-pt="Selecione uma seção."></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center">
+    <p class="mb-0">Herramienta de práctica — examen de naturalización mexicana.<br>
+    <span class="sub" data-en="Practice tool — Mexican naturalization exam." data-cs="Cvičný nástroj — zkouška mexické naturalizace." data-de="Übungstool — Mexikanische Einbürgerungsprüfung." data-it="Strumento di pratica — esame di naturalizzazione messicana." data-pt="Ferramenta de prática — exame de naturalização mexicana."></span></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="data.js"></script>
+<script>if(typeof translations==='undefined')var translations={};</script>
+<script src="translations.js" onerror=""></script>
+<script>
+var queue=[],retryQueue=[],currentQ=null,isRetry=false;
+var score=0,errors=0,retryCount=0,totalOriginal=0,answered=0;
+var userAnswers=[],currentMode='',currentExamNum=null;
+var answerLocked=false,rehearsalMode=false,MAX_R=2;
+var curLang='none';
+var timedMode=false,timerSec=30,timerId=null,timeLeft=0;
+
+// ── Translation lookup ──
+function tr(text){
+    if(curLang==='none'||!translations[curLang])return '';
+    return translations[curLang][text]||'';
+}
+
+// ── Language toggle ──
+function setLang(lang){
+    curLang=lang;
+    document.querySelectorAll('#langToggle span').forEach(function(s){s.classList.toggle('active',s.getAttribute('data-l')===lang)});
+    document.querySelectorAll('.sub').forEach(function(el){
+        if(el.id&&(el.id==='qTextSub'||el.id==='fcQuestionSub'||el.id==='fcAnswerSub'))return;
+        if(lang==='none')el.textContent='';
+        else el.textContent=el.getAttribute('data-'+lang)||'';
+    });
+    // Update dynamic translation subs if on quiz/flashcard screen
+    if(currentQ){
+        var qs=document.getElementById('qTextSub');
+        if(qs)qs.textContent=tr(currentQ.text);
+        // Update option subs
+        var opts=document.querySelectorAll('#opts .opt-sub');
+        opts.forEach(function(el){el.textContent=tr(el.getAttribute('data-src'));});
+    }
+    if(fcCards.length>0&&fcIdx<fcCards.length){
+        var fqs=document.getElementById('fcQuestionSub');
+        if(fqs)fqs.textContent=tr(fcCards[fcIdx].text);
+        var fas=document.getElementById('fcAnswerSub');
+        if(fas)fas.textContent=tr(fcCards[fcIdx].options[fcCards[fcIdx].correct]);
+    }
+    updateMistakeCount();
+}
+
+var _e=document.createElement('div');
+function esc(t){if(!t)return '';_e.textContent=t;return _e.innerHTML;}
+
+// ── Mistakes storage ──
+function getMistakes(){try{return JSON.parse(localStorage.getItem('nmx_mistakes')||'[]');}catch(e){return [];}}
+function saveMistakes(arr){try{localStorage.setItem('nmx_mistakes',JSON.stringify(arr));}catch(e){}}
+function addMistake(q){
+    var m=getMistakes(),key=q.text;
+    for(var i=0;i<m.length;i++)if(m[i].text===key)return;
+    m.push({text:q.text,options:q.options,correct:q.correct});
+    saveMistakes(m);
+}
+function removeMistake(text){
+    var m=getMistakes();
+    saveMistakes(m.filter(function(x){return x.text!==text;}));
+}
+function updateMistakeCount(){
+    var c=getMistakes().length;
+    var el=document.getElementById('mistakeCount');
+    if(el)el.textContent=c>0?(c+' guardados'):'';
+}
+
+function init(){
+    var grid=document.getElementById('examGrid');
+    Object.keys(examData).sort(function(a,b){return +a-+b}).forEach(function(k){
+        var b=document.createElement('button');
+        b.className='btn btn-mx-outline btn-sm';b.textContent=k;
+        b.addEventListener('click',function(){startExam(+k)});
+        grid.appendChild(b);
+    });
+    var tabs=document.getElementById('guideTabs');
+    Object.keys(guideData).forEach(function(key,i){
+        var li=document.createElement('li');li.className='nav-item mb-1';
+        var a=document.createElement('a');a.className='nav-link'+(i===0?' active':'');a.href='#';
+        a.textContent=guideData[key].title||key;
+        a.addEventListener('click',function(e){
+            e.preventDefault();
+            tabs.querySelectorAll('.nav-link').forEach(function(n){n.classList.remove('active')});
+            a.classList.add('active');renderGuide(key);
+        });
+        li.appendChild(a);tabs.appendChild(li);
+    });
+    updateMistakeCount();
+}
+
+function renderGuide(key){
+    var s=guideData[key],el=document.getElementById('guideContent'),h='<h3 style="color:var(--mx)">'+esc(s.title)+'</h3>';
+    for(var i=0;i<s.items.length;i++){
+        var it=s.items[i];
+        if(it.type==='heading')h+='<h5 class="mt-4 mb-2" style="color:var(--mx)">'+esc(it.text)+'</h5>';
+        else if(it.type==='text')h+='<p>'+esc(it.text)+'</p>';
+        else if(it.type==='table'){
+            h+='<div class="table-responsive"><table class="table table-sm table-bordered guide-table mb-3"><tbody>';
+            for(var r=0;r<it.rows.length;r++){h+='<tr>';for(var c=0;c<it.rows[r].length;c++)h+=(c===0?'<th>':'<td>')+esc(it.rows[r][c])+(c===0?'</th>':'</td>');h+='</tr>';}
+            h+='</tbody></table></div>';
+        }
+    }
+    el.innerHTML=h;
+}
+
+function showScreen(id){
+    ['homeScreen','quizScreen','resultsScreen','guideScreen','flashcardScreen'].forEach(function(s){document.getElementById(s).style.display=(s===id)?'':'none'});
+    window.scrollTo(0,0);
+    if(id!=='quizScreen')stopTimer();
+}
+function showHome(){showScreen('homeScreen');updateMistakeCount();}
+function showGuide(){showScreen('guideScreen');var t=document.querySelector('#guideTabs .nav-link');if(t&&!document.querySelector('#guideContent h3'))t.click();}
+function confirmExit(){if(answered>0&&answered<totalOriginal&&!confirm('Salir? / Exit?'))return;showHome();}
+
+function startExam(n){currentMode='single';currentExamNum=n;timedMode=false;var e=examData[String(n)];if(e)loadQ(e.questions,'Examen '+n)}
+function startAllExams(){
+    currentMode='all';currentExamNum=null;timedMode=false;var a=[];
+    Object.keys(examData).sort(function(x,y){return +x-+y}).forEach(function(k){var q=examData[k].questions;for(var i=0;i<q.length;i++)a.push({text:q[i].text,options:q[i].options,correct:q[i].correct,examNum:+k})});
+    loadQ(a,'Todos los Exámenes');
+}
+function startRandomExam(){
+    currentMode='random';timedMode=false;var ks=Object.keys(examData),k=ks[Math.floor(Math.random()*ks.length)];
+    currentExamNum=+k;loadQ(examData[k].questions.slice().sort(function(){return Math.random()-.5}),'Examen Aleatorio (#'+k+')');
+}
+
+function startTimedQuiz(){
+    currentMode='timed';timedMode=true;currentExamNum=null;
+    var ks=Object.keys(examData),k=ks[Math.floor(Math.random()*ks.length)];
+    currentExamNum=+k;loadQ(examData[k].questions.slice().sort(function(){return Math.random()-.5}),'Contrarreloj (#'+k+')');
+}
+
+function startMistakesOnly(){
+    var m=getMistakes();
+    if(m.length===0){alert('No hay errores guardados.\nNo saved mistakes.');return;}
+    currentMode='mistakes';timedMode=false;currentExamNum=null;
+    m.sort(function(){return Math.random()-.5});
+    loadQ(m,'Solo Errores ('+m.length+')');
+}
+
+function restartCurrent(){
+    if(currentMode==='single'&&currentExamNum)startExam(currentExamNum);
+    else if(currentMode==='all')startAllExams();
+    else if(currentMode==='timed')startTimedQuiz();
+    else if(currentMode==='mistakes')startMistakesOnly();
+    else startRandomExam();
+}
+
+function loadQ(qs,title){
+    rehearsalMode=document.getElementById('rehearsalToggle').checked;
+    queue=[];for(var i=0;i<qs.length;i++)queue.push({text:qs[i].text,options:qs[i].options,correct:qs[i].correct,examNum:qs[i].examNum||currentExamNum,_r:0});
+    retryQueue=[];score=0;errors=0;retryCount=0;answered=0;totalOriginal=qs.length;
+    userAnswers=[];currentQ=null;isRetry=false;answerLocked=false;
+    document.getElementById('quizTitle').textContent=title;
+    document.getElementById('qTotal').textContent=totalOriginal;
+    document.getElementById('badgeRetries').style.display=rehearsalMode?'':'none';
+    document.getElementById('timerBarWrap').style.display=timedMode?'':'none';
+    document.getElementById('badgeTimer').style.display=timedMode?'':'none';
+    updateUI();showScreen('quizScreen');pick();
+}
+
+function pick(){
+    stopTimer();
+    if(rehearsalMode&&retryQueue.length>0&&(queue.length===0||(answered>0&&answered%3===0))){currentQ=retryQueue.shift();isRetry=true;}
+    else if(queue.length>0){currentQ=queue.shift();isRetry=false;}
+    else if(rehearsalMode&&retryQueue.length>0){currentQ=retryQueue.shift();isRetry=true;}
+    else{showResults();return;}
+    answerLocked=false;renderQ();
+    if(timedMode)startTimer();
+}
+function nextQuestion(){document.getElementById('nextBtn').style.display='none';pick();}
+
+function renderQ(){
+    document.getElementById('qNum').textContent=answered+1;
+    document.getElementById('qText').textContent=currentQ.text;
+    document.getElementById('qTextSub').textContent=tr(currentQ.text);
+    document.getElementById('retryBadge').style.display=isRetry?'':'none';
+    document.getElementById('nextBtn').style.display='none';
+    var c=document.getElementById('opts');c.innerHTML='';
+    var idx=[0,1,2,3];for(var i=3;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=idx[i];idx[i]=idx[j];idx[j]=t;}
+    for(var d=0;d<idx.length;d++){
+        var b=document.createElement('button');b.className='btn opt-btn w-100';b.type='button';
+        var optText=currentQ.options[idx[d]];
+        var subText=tr(optText);
+        b.innerHTML='<strong>'+String.fromCharCode(65+d)+')</strong> '+esc(optText)+(subText?'<span class="sub opt-sub" data-src="'+esc(optText)+'">'+esc(subText)+'</span>':'');
+        b.setAttribute('data-o',idx[d]);b.addEventListener('click',onOpt);c.appendChild(b);
+    }
+    updateProg();
+}
+
+function onOpt(){answer(this,+this.getAttribute('data-o'))}
+function answer(btn,sel){
+    if(answerLocked)return;answerLocked=true;
+    stopTimer();
+    var cor=currentQ.correct,bs=document.getElementById('opts').children;
+    for(var i=0;i<bs.length;i++){bs[i].disabled=true;if(+bs[i].getAttribute('data-o')===cor)bs[i].classList.add('correct');}
+    if(sel===cor){btn.classList.add('correct');score++;
+        if(currentMode==='mistakes')removeMistake(currentQ.text);
+    }
+    else{btn.classList.add('wrong');errors++;
+        addMistake(currentQ);
+        if(rehearsalMode&&currentQ._r<MAX_R)retryQueue.push({text:currentQ.text,options:currentQ.options,correct:currentQ.correct,examNum:currentQ.examNum,_r:currentQ._r+1});
+    }
+    if(!isRetry){answered++;userAnswers.push({text:currentQ.text,options:currentQ.options,sel:sel,cor:cor,ok:sel===cor});}
+    else retryCount++;
+    updateUI();document.getElementById('nextBtn').style.display='';document.getElementById('nextBtn').focus();
+}
+
+// ── Timer ──
+function startTimer(){
+    timeLeft=timerSec;
+    updateTimerDisplay();
+    timerId=setInterval(function(){
+        timeLeft--;
+        updateTimerDisplay();
+        if(timeLeft<=0){
+            stopTimer();
+            timerExpired();
+        }
+    },1000);
+}
+function stopTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
+function updateTimerDisplay(){
+    var fill=document.getElementById('timerFill');
+    var badge=document.getElementById('badgeTimer');
+    var pct=Math.max(0,timeLeft/timerSec*100);
+    fill.style.width=pct+'%';
+    fill.className='timer-fill'+(timeLeft<=5?' danger':timeLeft<=10?' warn':'');
+    badge.textContent=timeLeft+'s';
+}
+function timerExpired(){
+    if(answerLocked)return;
+    answerLocked=true;
+    var cor=currentQ.correct,bs=document.getElementById('opts').children;
+    for(var i=0;i<bs.length;i++){bs[i].disabled=true;if(+bs[i].getAttribute('data-o')===cor)bs[i].classList.add('correct');}
+    errors++;
+    addMistake(currentQ);
+    if(!isRetry){answered++;userAnswers.push({text:currentQ.text,options:currentQ.options,sel:-1,cor:cor,ok:false});}
+    else retryCount++;
+    updateUI();document.getElementById('nextBtn').style.display='';document.getElementById('nextBtn').focus();
+}
+
+function updateProg(){
+    var p=totalOriginal>0?Math.round(answered/totalOriginal*100):0;
+    document.getElementById('progressBar').style.width=p+'%';document.getElementById('progressText').textContent=p+'%';
+}
+function updateUI(){
+    updateProg();
+    document.getElementById('badgeCorrect').textContent=score+' correctas';
+    document.getElementById('badgeWrong').textContent=errors+' errores';
+    if(rehearsalMode)document.getElementById('badgeRetries').textContent=retryCount+' repasos';
+}
+
+function showResults(){
+    var ok=0;for(var i=0;i<userAnswers.length;i++)if(userAnswers[i].ok)ok++;
+    var pct=totalOriginal>0?Math.round(ok/totalOriginal*100):0;
+    document.getElementById('finalScore').textContent=ok+'/'+totalOriginal;
+    document.getElementById('rCorrect').textContent=ok;
+    document.getElementById('rWrong').textContent=totalOriginal-ok;
+    document.getElementById('rPct').textContent=pct+'%';
+    var m={
+        80:{es:'Excelente!',en:'Excellent!',cs:'Výborně!',de:'Ausgezeichnet!',it:'Eccellente!',pt:'Excelente!'},
+        60:{es:'Buen trabajo.',en:'Good job.',cs:'Dobrá práce.',de:'Gute Arbeit.',it:'Buon lavoro.',pt:'Bom trabalho.'},
+        0:{es:'Estudia más.',en:'Study more.',cs:'Více studuj.',de:'Lerne mehr.',it:'Studia di più.',pt:'Estude mais.'}
+    };
+    var tier=pct>=80?80:pct>=60?60:0,t=m[tier];
+    document.getElementById('resultMsg').textContent=curLang==='none'?t.es:t.es+' / '+t[curLang];
+    var rv=document.getElementById('reviewContent'),h='';
+    for(var i=0;i<userAnswers.length;i++){
+        var a=userAnswers[i],ic=a.ok?'fa-check-circle text-success':'fa-times-circle text-danger';
+        var timeout=a.sel===-1;
+        h+='<div class="border rounded p-3 mb-2"><div class="d-flex justify-content-between mb-1"><strong>'+(i+1)+'</strong><i class="fas '+ic+'"></i></div>';
+        h+='<p class="mb-1">'+esc(a.text)+'</p>';
+        var tSub=tr(a.text);
+        if(tSub)h+='<p class="sub mb-1">'+esc(tSub)+'</p>';
+        if(timeout){
+            h+='<p class="mb-1 text-danger"><i class="fas fa-clock me-1"></i>Tiempo agotado</p>';
+        }else{
+            h+='<p class="mb-1 '+(a.ok?'text-success':'text-danger')+'">'+esc(a.options[a.sel])+'</p>';
+            var oSub=tr(a.options[a.sel]);
+            if(oSub)h+='<p class="sub mb-0">'+esc(oSub)+'</p>';
+        }
+        if(!a.ok){
+            h+='<p class="mb-0 text-success"><strong>&#10003;</strong> '+esc(a.options[a.cor])+'</p>';
+            var cSub=tr(a.options[a.cor]);
+            if(cSub)h+='<p class="sub mb-0">'+esc(cSub)+'</p>';
+        }
+        h+='</div>';
+    }
+    rv.innerHTML=h;showScreen('resultsScreen');
+}
+
+// ── Flashcard mode ──
+var fcCards=[],fcIdx=0,fcKnew=0,fcRevealed=false;
+
+function startFlashcards(){
+    var a=[];
+    Object.keys(examData).sort(function(x,y){return +x-+y}).forEach(function(k){
+        var q=examData[k].questions;
+        for(var i=0;i<q.length;i++)a.push({text:q[i].text,options:q[i].options,correct:q[i].correct});
+    });
+    // Shuffle
+    for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}
+    fcCards=a;fcIdx=0;fcKnew=0;fcRevealed=false;
+    document.getElementById('fcTitle').textContent='Tarjetas ('+a.length+')';
+    document.getElementById('fcDone').style.display='none';
+    showScreen('flashcardScreen');
+    fcRender();
+}
+
+function fcRender(){
+    if(fcIdx>=fcCards.length){fcFinish();return;}
+    var q=fcCards[fcIdx];
+    fcRevealed=false;
+    document.getElementById('fcProgress').textContent=(fcIdx+1)+'/'+fcCards.length;
+    var pct=Math.round(fcIdx/fcCards.length*100);
+    document.getElementById('fcBar').style.width=pct+'%';
+    document.getElementById('fcQuestion').textContent=q.text;
+    document.getElementById('fcQuestionSub').textContent=tr(q.text);
+    document.getElementById('fcAnswerText').textContent=q.options[q.correct];
+    document.getElementById('fcAnswerSub').textContent=tr(q.options[q.correct]);
+    document.getElementById('fcAnswer').style.display='none';
+    document.getElementById('fcHint').style.display='';
+    document.getElementById('fcWrong').style.display='none';
+    document.getElementById('fcRight').style.display='none';
+}
+
+function fcReveal(){
+    if(fcRevealed)return;
+    fcRevealed=true;
+    document.getElementById('fcAnswer').style.display='';
+    document.getElementById('fcHint').style.display='none';
+    document.getElementById('fcWrong').style.display='';
+    document.getElementById('fcRight').style.display='';
+}
+
+function fcNext(knew){
+    if(knew)fcKnew++;
+    fcIdx++;
+    fcRender();
+}
+
+function fcFinish(){
+    document.getElementById('fcCard').style.display='none';
+    document.getElementById('fcWrong').style.display='none';
+    document.getElementById('fcRight').style.display='none';
+    document.getElementById('fcDone').style.display='';
+    document.getElementById('fcBar').style.width='100%';
+    document.getElementById('fcScore').textContent=fcKnew+'/'+fcCards.length+' sabías la respuesta.';
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
