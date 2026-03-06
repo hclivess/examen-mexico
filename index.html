@@ -101,26 +101,34 @@
                         </div>
                     </div>
                     <!-- Learning modes -->
+                    <h6 class="text-muted mb-2 mt-1"><i class="fas fa-gamepad me-1"></i>Modos de estudio <span class="sub" data-en="Study modes" data-cs="Režimy studia" data-de="Lernmodi" data-it="Modalità di studio" data-pt="Modos de estudo" style="display:inline;margin-left:4px"></span></h6>
                     <div class="row g-3 mb-3">
-                        <div class="col-sm-4">
+                        <div class="col-sm-6 col-md-3">
                             <div class="mode-btn" onclick="startFlashcards()">
                                 <i class="fas fa-clone"></i>
                                 <strong>Tarjetas</strong><br>
-                                <span class="sub" data-en="Flashcards" data-cs="Kartičky" data-de="Karteikarten" data-it="Schede" data-pt="Cartões"></span>
+                                <span class="sub" data-en="Flashcards — flip to reveal" data-cs="Kartičky — otočit pro odpověď" data-de="Karteikarten — umdrehen" data-it="Schede — gira per vedere" data-pt="Cartões — vire para ver"></span>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-6 col-md-3">
                             <div class="mode-btn" onclick="startTimedQuiz()">
                                 <i class="fas fa-stopwatch"></i>
                                 <strong>Contrarreloj</strong><br>
-                                <span class="sub" data-en="Timed Quiz" data-cs="Na čas" data-de="Zeitquiz" data-it="A tempo" data-pt="Cronometrado"></span>
+                                <span class="sub" data-en="Timed — 30s per question" data-cs="Na čas — 30s na otázku" data-de="Zeitquiz — 30s pro Frage" data-it="A tempo — 30s a domanda" data-pt="Cronometrado — 30s por pergunta"></span>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-6 col-md-3">
+                            <div class="mode-btn" onclick="startLivesMode()">
+                                <i class="fas fa-heart"></i>
+                                <strong>Vidas</strong><br>
+                                <span class="sub" data-en="Lives — 3 mistakes = game over" data-cs="Životy — 3 chyby = konec" data-de="Leben — 3 Fehler = Ende" data-it="Vite — 3 errori = fine" data-pt="Vidas — 3 erros = fim"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-3">
                             <div class="mode-btn" onclick="startMistakesOnly()">
                                 <i class="fas fa-rotate-left"></i>
                                 <strong>Solo Errores</strong><br>
-                                <span class="sub" data-en="Mistakes Only" data-cs="Jen chyby" data-de="Nur Fehler" data-it="Solo errori" data-pt="Só erros"></span>
+                                <span class="sub" data-en="Mistakes — retry wrong answers" data-cs="Chyby — opakovat špatné" data-de="Fehler — falsche wiederholen" data-it="Errori — ripeti gli sbagli" data-pt="Erros — repetir os errados"></span>
                                 <small class="text-muted d-block" id="mistakeCount"></small>
                             </div>
                         </div>
@@ -155,6 +163,7 @@
                         <span class="badge bg-danger" id="badgeWrong">0</span>
                         <span class="badge bg-warning text-dark" id="badgeRetries" style="display:none">0</span>
                         <span class="badge bg-secondary" id="badgeTimer" style="display:none">30s</span>
+                        <span id="livesDisplay" style="display:none;font-size:1.1rem;letter-spacing:2px" class="text-danger"></span>
                         <button class="btn btn-sm btn-outline-secondary" onclick="confirmExit()"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
@@ -177,6 +186,16 @@
                     <button class="btn btn-mx btn-lg" id="nextBtn" style="display:none" onclick="nextQuestion()">
                         Siguiente <span class="sub" data-en="Next" data-cs="Další" data-de="Weiter" data-it="Avanti" data-pt="Próxima" style="display:inline;margin-left:4px"></span> <i class="fas fa-arrow-right ms-1"></i>
                     </button>
+                </div>
+                <!-- Game Over (lives mode) -->
+                <div id="gameOverCard" class="card text-center p-4 mt-3" style="display:none">
+                    <h3 class="text-danger mb-2"><i class="fas fa-heart-crack me-2"></i>Game Over</h3>
+                    <span class="sub" data-en="You ran out of lives!" data-cs="Došly ti životy!" data-de="Du hast keine Leben mehr!" data-it="Hai esaurito le vite!" data-pt="Você ficou sem vidas!"></span>
+                    <p class="fs-4 fw-bold my-3" id="goScore"></p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <button class="btn btn-mx" onclick="restartCurrent()"><i class="fas fa-redo me-2"></i>Reintentar</button>
+                        <button class="btn btn-outline-secondary" onclick="showHome()"><i class="fas fa-home me-2"></i>Inicio</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -291,6 +310,7 @@ var userAnswers=[],currentMode='',currentExamNum=null;
 var answerLocked=false,rehearsalMode=false,MAX_R=2;
 var curLang='none';
 var timedMode=false,timerSec=30,timerId=null,timeLeft=0;
+var livesMode=false,maxLives=3,livesLeft=0;
 
 // ── Translation lookup ──
 function tr(text){
@@ -393,27 +413,36 @@ function showHome(){showScreen('homeScreen');updateMistakeCount();}
 function showGuide(){showScreen('guideScreen');var t=document.querySelector('#guideTabs .nav-link');if(t&&!document.querySelector('#guideContent h3'))t.click();}
 function confirmExit(){if(answered>0&&answered<totalOriginal&&!confirm('Salir? / Exit?'))return;showHome();}
 
-function startExam(n){currentMode='single';currentExamNum=n;timedMode=false;var e=examData[String(n)];if(e)loadQ(e.questions,'Examen '+n)}
+function startExam(n){currentMode='single';currentExamNum=n;timedMode=false;livesMode=false;var e=examData[String(n)];if(e)loadQ(e.questions,'Examen '+n)}
 function startAllExams(){
-    currentMode='all';currentExamNum=null;timedMode=false;var a=[];
+    currentMode='all';currentExamNum=null;timedMode=false;livesMode=false;var a=[];
     Object.keys(examData).sort(function(x,y){return +x-+y}).forEach(function(k){var q=examData[k].questions;for(var i=0;i<q.length;i++)a.push({text:q[i].text,options:q[i].options,correct:q[i].correct,examNum:+k})});
     loadQ(a,'Todos los Exámenes');
 }
 function startRandomExam(){
-    currentMode='random';timedMode=false;var ks=Object.keys(examData),k=ks[Math.floor(Math.random()*ks.length)];
+    currentMode='random';timedMode=false;livesMode=false;var ks=Object.keys(examData),k=ks[Math.floor(Math.random()*ks.length)];
     currentExamNum=+k;loadQ(examData[k].questions.slice().sort(function(){return Math.random()-.5}),'Examen Aleatorio (#'+k+')');
 }
 
 function startTimedQuiz(){
-    currentMode='timed';timedMode=true;currentExamNum=null;
+    currentMode='timed';timedMode=true;livesMode=false;currentExamNum=null;
     var ks=Object.keys(examData),k=ks[Math.floor(Math.random()*ks.length)];
     currentExamNum=+k;loadQ(examData[k].questions.slice().sort(function(){return Math.random()-.5}),'Contrarreloj (#'+k+')');
+}
+
+function startLivesMode(){
+    currentMode='lives';timedMode=false;livesMode=true;livesLeft=maxLives;currentExamNum=null;
+    // Shuffle all questions
+    var a=[];
+    Object.keys(examData).sort(function(x,y){return +x-+y}).forEach(function(k){var q=examData[k].questions;for(var i=0;i<q.length;i++)a.push({text:q[i].text,options:q[i].options,correct:q[i].correct,examNum:+k})});
+    for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}
+    loadQ(a,'Vidas ('+maxLives+' <i class="fas fa-heart text-danger"></i>)');
 }
 
 function startMistakesOnly(){
     var m=getMistakes();
     if(m.length===0){alert('No hay errores guardados.\nNo saved mistakes.');return;}
-    currentMode='mistakes';timedMode=false;currentExamNum=null;
+    currentMode='mistakes';timedMode=false;livesMode=false;currentExamNum=null;
     m.sort(function(){return Math.random()-.5});
     loadQ(m,'Solo Errores ('+m.length+')');
 }
@@ -422,6 +451,7 @@ function restartCurrent(){
     if(currentMode==='single'&&currentExamNum)startExam(currentExamNum);
     else if(currentMode==='all')startAllExams();
     else if(currentMode==='timed')startTimedQuiz();
+    else if(currentMode==='lives')startLivesMode();
     else if(currentMode==='mistakes')startMistakesOnly();
     else startRandomExam();
 }
@@ -431,12 +461,20 @@ function loadQ(qs,title){
     queue=[];for(var i=0;i<qs.length;i++)queue.push({text:qs[i].text,options:qs[i].options,correct:qs[i].correct,examNum:qs[i].examNum||currentExamNum,_r:0});
     retryQueue=[];score=0;errors=0;retryCount=0;answered=0;totalOriginal=qs.length;
     userAnswers=[];currentQ=null;isRetry=false;answerLocked=false;
-    document.getElementById('quizTitle').textContent=title;
-    document.getElementById('qTotal').textContent=totalOriginal;
+    document.getElementById('quizTitle').innerHTML=title;
+    document.getElementById('qTotal').textContent=livesMode?'∞':totalOriginal;
     document.getElementById('badgeRetries').style.display=rehearsalMode?'':'none';
     document.getElementById('timerBarWrap').style.display=timedMode?'':'none';
     document.getElementById('badgeTimer').style.display=timedMode?'':'none';
+    document.getElementById('livesDisplay').style.display=livesMode?'':'none';
+    document.getElementById('gameOverCard').style.display='none';
+    if(livesMode)updateLives();
     updateUI();showScreen('quizScreen');pick();
+}
+function updateLives(){
+    var el=document.getElementById('livesDisplay'),h='';
+    for(var i=0;i<maxLives;i++)h+=(i<livesLeft?'<i class="fas fa-heart"></i>':'<i class="fas fa-heart" style="opacity:.2"></i>')+' ';
+    el.innerHTML=h;
 }
 
 function pick(){
@@ -479,11 +517,19 @@ function answer(btn,sel){
     }
     else{btn.classList.add('wrong');errors++;
         addMistake(currentQ);
+        if(livesMode){livesLeft--;updateLives();}
         if(rehearsalMode&&currentQ._r<MAX_R)retryQueue.push({text:currentQ.text,options:currentQ.options,correct:currentQ.correct,examNum:currentQ.examNum,_r:currentQ._r+1});
     }
     if(!isRetry){answered++;userAnswers.push({text:currentQ.text,options:currentQ.options,sel:sel,cor:cor,ok:sel===cor});}
     else retryCount++;
-    updateUI();document.getElementById('nextBtn').style.display='';document.getElementById('nextBtn').focus();
+    updateUI();
+    if(livesMode&&livesLeft<=0){gameOver();return;}
+    document.getElementById('nextBtn').style.display='';document.getElementById('nextBtn').focus();
+}
+function gameOver(){
+    document.getElementById('nextBtn').style.display='none';
+    document.getElementById('gameOverCard').style.display='';
+    document.getElementById('goScore').textContent=score+' correctas / '+answered+' preguntas';
 }
 
 // ── Timer ──
@@ -521,8 +567,9 @@ function timerExpired(){
 }
 
 function updateProg(){
-    var p=totalOriginal>0?Math.round(answered/totalOriginal*100):0;
-    document.getElementById('progressBar').style.width=p+'%';document.getElementById('progressText').textContent=p+'%';
+    var p=livesMode?(answered>0?Math.min(100,answered):0):(totalOriginal>0?Math.round(answered/totalOriginal*100):0);
+    document.getElementById('progressBar').style.width=(livesMode?0:p)+'%';
+    document.getElementById('progressText').textContent=livesMode?(answered+' respondidas'):p+'%';
 }
 function updateUI(){
     updateProg();
