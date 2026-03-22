@@ -320,7 +320,7 @@
             <h2 class="fw-bold mb-1"><i class="fas fa-language me-2"></i>Conjugación de Verbos</h2>
             <span class="sub" data-en="Verb Conjugation" data-cs="Časování sloves" data-de="Konjugation" data-it="Coniugazione dei verbi" data-pt="Conjugação de verbos"></span>
             <p class="mb-0 mt-1">Pronombres y conjugaciones de los verbos más usados.</p>
-            <span class="sub" data-en="Pronouns and conjugations of the most common verbs." data-cs="Zájmena a časování nejběžnějších sloves." data-de="Pronomen und Konjugationen der häufigsten Verben." data-it="Pronomi e coniugazioni dei verbi più comuni." data-pt="Pronomes e conjugações dos verbos mais comuns."></span>
+            <span class="sub" data-en="Pronouns and conjugations of the most common verbs." data-cs="Časování a skloňování nejběžnějších sloves." data-de="Pronomen und Konjugationen der häufigsten Verben." data-it="Pronomi e coniugazioni dei verbi più comuni." data-pt="Pronomes e conjugações dos verbos mais comuns."></span>
         </div>
     </section>
     <div class="container py-4">
@@ -352,20 +352,24 @@
                 <!-- Mode toggle -->
                 <div class="d-flex gap-2 mb-3 flex-wrap">
                     <button class="btn btn-mx" id="verbBrowseBtn" onclick="verbSetMode('browse')"><i class="fas fa-book me-1"></i>Consultar <span class="sub" data-en="Browse" data-cs="Procházet" data-de="Nachschlagen" data-it="Consultare" data-pt="Consultar" style="display:inline;color:rgba(255,255,255,.65);margin-left:3px"></span></button>
-                    <button class="btn btn-mx-outline" id="verbQuizBtn" onclick="verbSetMode('quiz')"><i class="fas fa-pen me-1"></i>Practicar <span class="sub" data-en="Practice" data-cs="Procvičovat" data-de="Üben" data-it="Praticare" data-pt="Praticar" style="display:inline;margin-left:3px"></span></button>
+                    <button class="btn btn-mx-outline" id="verbQuizBtn" onclick="verbSetMode('quiz')"><i class="fas fa-pen me-1"></i>Opción múltiple <span class="sub" data-en="Multiple choice" data-cs="Výběr" data-de="Auswahl" data-it="Scelta multipla" data-pt="Múltipla escolha" style="display:inline;margin-left:3px"></span></button>
+                    <button class="btn btn-mx-outline" id="verbFillBtn" onclick="verbSetMode('fill')"><i class="fas fa-keyboard me-1"></i>Escribir <span class="sub" data-en="Fill in" data-cs="Doplnit" data-de="Ausfüllen" data-it="Compilare" data-pt="Preencher" style="display:inline;margin-left:3px"></span></button>
                     <button class="btn btn-outline-secondary ms-auto" onclick="showHome()"><i class="fas fa-home me-1"></i>Inicio</button>
                 </div>
+
+                <!-- Category filters -->
+                <div class="verb-filter" id="verbCatFilter"></div>
 
                 <!-- Browse mode -->
                 <div id="verbBrowse">
                     <div id="verbList"></div>
                 </div>
 
-                <!-- Quiz mode -->
+                <!-- Quiz mode (multiple choice) -->
                 <div id="verbQuiz" style="display:none">
                     <div class="card p-4">
                         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                            <h5 class="mb-0" id="vqTitle">Practicar Conjugaciones</h5>
+                            <h5 class="mb-0" id="vqTitle">Opción múltiple</h5>
                             <div class="d-flex gap-2">
                                 <span class="badge bg-success" id="vqCorrect">0</span>
                                 <span class="badge bg-danger" id="vqWrong">0</span>
@@ -387,6 +391,53 @@
                             <p id="vqFinalMsg"></p>
                             <div class="d-flex justify-content-center gap-3">
                                 <button class="btn btn-mx" onclick="verbStartQuiz()"><i class="fas fa-redo me-2"></i>Otra vez</button>
+                                <button class="btn btn-mx-outline" onclick="verbSetMode('browse')"><i class="fas fa-book me-2"></i>Consultar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fill-in mode (typing) -->
+                <div id="verbFill" style="display:none">
+                    <div class="card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <h5 class="mb-0">Escribir la conjugación</h5>
+                            <div class="d-flex gap-2">
+                                <span class="badge bg-success" id="vfCorrect">0</span>
+                                <span class="badge bg-danger" id="vfWrong">0</span>
+                                <span class="badge bg-primary" id="vfProgress">0/0</span>
+                            </div>
+                        </div>
+                        <div class="progress mb-3"><div class="progress-bar bg-success" id="vfBar" style="width:0%"></div></div>
+                        <div id="vfBody">
+                            <div class="text-center mb-3">
+                                <span class="badge bg-secondary fs-6" id="vfTense"></span>
+                            </div>
+                            <h4 class="text-center mb-1" id="vfPrompt"></h4>
+                            <p class="text-center text-muted mb-3" id="vfHint"></p>
+                            <div class="d-flex justify-content-center gap-2 mb-3">
+                                <input type="text" class="form-control" id="vfInput" style="max-width:300px;text-align:center;font-size:1.2rem" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="...">
+                                <button class="btn btn-mx" id="vfSubmit" onclick="vfCheck()"><i class="fas fa-check"></i></button>
+                            </div>
+                            <div id="vfFeedback" class="text-center mb-2" style="min-height:2rem"></div>
+                            <!-- Special character buttons for accents -->
+                            <div class="text-center mb-2" id="vfAccents">
+                                <small class="text-muted d-block mb-1">Caracteres especiales:</small>
+                                <button class="btn btn-sm btn-outline-secondary mx-1" type="button" onclick="vfInsert('á')">á</button>
+                                <button class="btn btn-sm btn-outline-secondary mx-1" type="button" onclick="vfInsert('é')">é</button>
+                                <button class="btn btn-sm btn-outline-secondary mx-1" type="button" onclick="vfInsert('í')">í</button>
+                                <button class="btn btn-sm btn-outline-secondary mx-1" type="button" onclick="vfInsert('ó')">ó</button>
+                                <button class="btn btn-sm btn-outline-secondary mx-1" type="button" onclick="vfInsert('ú')">ú</button>
+                                <button class="btn btn-sm btn-outline-secondary mx-1" type="button" onclick="vfInsert('ñ')">ñ</button>
+                                <button class="btn btn-sm btn-outline-secondary mx-1" type="button" onclick="vfInsert('ü')">ü</button>
+                            </div>
+                        </div>
+                        <div id="vfDone" style="display:none" class="text-center py-3">
+                            <h3><i class="fas fa-trophy text-warning me-2"></i>Completado!</h3>
+                            <p class="fs-4 fw-bold" id="vfFinalScore"></p>
+                            <p id="vfFinalMsg"></p>
+                            <div class="d-flex justify-content-center gap-3">
+                                <button class="btn btn-mx" onclick="verbStartFill()"><i class="fas fa-redo me-2"></i>Otra vez</button>
                                 <button class="btn btn-mx-outline" onclick="verbSetMode('browse')"><i class="fas fa-book me-2"></i>Consultar</button>
                             </div>
                         </div>
@@ -782,68 +833,113 @@ function fcFinish(){
 }
 
 // ── Verb Conjugation Feature ──
+var verbCurrentCat='all';
+
 function showVerbs(){
     showScreen('verbScreen');
+    verbRenderCatFilter();
     if(!document.getElementById('verbList').innerHTML)verbRenderBrowse();
+}
+
+function verbRenderCatFilter(){
+    var el=document.getElementById('verbCatFilter');
+    if(el.innerHTML)return;
+    var h='<button class="btn btn-sm active-filter" onclick="verbFilterCat(\'all\',this)">Todos</button>';
+    for(var c=0;c<verbCategories.length;c++){
+        var cat=verbCategories[c];
+        h+='<button class="btn btn-sm btn-outline-secondary" onclick="verbFilterCat(\''+cat.id+'\',this)">'+esc(cat.label)+'</button>';
+    }
+    el.innerHTML=h;
+}
+
+function verbFilterCat(cat,btn){
+    verbCurrentCat=cat;
+    var bs=document.getElementById('verbCatFilter').children;
+    for(var i=0;i<bs.length;i++){bs[i].className='btn btn-sm btn-outline-secondary';}
+    btn.className='btn btn-sm active-filter';
+    verbRenderBrowse();
 }
 
 function verbSetMode(mode){
     document.getElementById('verbBrowse').style.display=mode==='browse'?'':'none';
     document.getElementById('verbQuiz').style.display=mode==='quiz'?'':'none';
+    document.getElementById('verbFill').style.display=mode==='fill'?'':'none';
     document.getElementById('verbBrowseBtn').className=mode==='browse'?'btn btn-mx':'btn btn-mx-outline';
     document.getElementById('verbQuizBtn').className=mode==='quiz'?'btn btn-mx':'btn btn-mx-outline';
+    document.getElementById('verbFillBtn').className=mode==='fill'?'btn btn-mx':'btn btn-mx-outline';
+    document.getElementById('verbCatFilter').style.display=mode==='browse'?'flex':'none';
     if(mode==='quiz')verbStartQuiz();
+    if(mode==='fill')verbStartFill();
+}
+
+function verbGetFiltered(){
+    if(verbCurrentCat==='all')return verbData;
+    var r=[];
+    for(var i=0;i<verbData.length;i++){if(verbData[i].category===verbCurrentCat)r.push(verbData[i]);}
+    return r;
 }
 
 function verbRenderBrowse(){
+    var list=verbGetFiltered();
     var el=document.getElementById('verbList'),h='';
-    for(var v=0;v<verbData.length;v++){
-        var vb=verbData[v],tenses=Object.keys(vb.tenses);
-        var tabId='vtab'+v;
-        h+='<div class="verb-card mb-3">';
-        h+='<div class="d-flex justify-content-between align-items-start flex-wrap gap-1">';
-        h+='<div><h5 class="mb-0">'+esc(vb.verb)+'</h5><span class="verb-meaning">'+esc(vb.meaning)+'</span></div>';
-        h+='</div>';
-        // Tense tabs
-        h+='<ul class="nav nav-pills tense-tabs mt-2 mb-2 flex-wrap gap-1">';
-        for(var t=0;t<tenses.length;t++){
-            h+='<li class="nav-item"><a class="nav-link'+(t===0?' active':'')+'" href="#" data-verb="'+v+'" data-tense="'+t+'" onclick="verbSwitchTense(this);return false">'+esc(tenses[t])+'</a></li>';
-        }
-        h+='</ul>';
-        // Tense tables
-        for(var t=0;t<tenses.length;t++){
-            h+='<div class="verb-tense-panel" id="vtp_'+v+'_'+t+'" style="'+(t===0?'':'display:none')+'">';
-            h+='<table class="conj-table">';
-            h+='<thead><tr><th>Pronombre</th><th>'+esc(tenses[t])+'</th></tr></thead><tbody>';
-            var forms=vb.tenses[tenses[t]];
-            for(var p=0;p<verbPronouns.length;p++){
-                h+='<tr><td class="pronoun">'+esc(verbPronouns[p])+'</td><td>'+esc(forms[p])+'</td></tr>';
+    // Group by category
+    var catOrder={};
+    for(var c=0;c<verbCategories.length;c++)catOrder[verbCategories[c].id]=c;
+    var grouped={};
+    for(var v=0;v<list.length;v++){
+        var cat=list[v].category||'other';
+        if(!grouped[cat])grouped[cat]=[];
+        grouped[cat].push({verb:list[v],idx:verbData.indexOf(list[v])});
+    }
+    for(var c=0;c<verbCategories.length;c++){
+        var cat=verbCategories[c];
+        if(!grouped[cat.id])continue;
+        var verbs=grouped[cat.id];
+        h+='<h5 class="mt-3 mb-2" style="color:var(--mx)"><i class="fas fa-tag me-1"></i>'+esc(cat.label)+' <small class="text-muted fw-normal">('+verbs.length+')</small></h5>';
+        for(var vi=0;vi<verbs.length;vi++){
+            var vb=verbs[vi].verb,idx=verbs[vi].idx;
+            var tenses=Object.keys(vb.tenses);
+            var meaning=getVerbMeaning(vb);
+            h+='<div class="verb-card mb-3">';
+            h+='<div class="d-flex justify-content-between align-items-start flex-wrap gap-1">';
+            h+='<div><h5 class="mb-0">'+esc(vb.verb)+'</h5><span class="verb-meaning">'+esc(meaning)+'</span></div>';
+            h+='</div>';
+            h+='<ul class="nav nav-pills tense-tabs mt-2 mb-2 flex-wrap gap-1">';
+            for(var t=0;t<tenses.length;t++){
+                h+='<li class="nav-item"><a class="nav-link'+(t===0?' active':'')+'" href="#" data-verb="'+idx+'" data-tense="'+t+'" onclick="verbSwitchTense(this);return false">'+esc(tenses[t])+'</a></li>';
             }
-            h+='</tbody></table></div>';
+            h+='</ul>';
+            for(var t=0;t<tenses.length;t++){
+                h+='<div class="verb-tense-panel" id="vtp_'+idx+'_'+t+'" style="'+(t===0?'':'display:none')+'">';
+                h+='<table class="conj-table">';
+                h+='<thead><tr><th>Pronombre</th><th>'+esc(tenses[t])+'</th></tr></thead><tbody>';
+                var forms=vb.tenses[tenses[t]];
+                for(var p=0;p<verbPronouns.length;p++){
+                    h+='<tr><td class="pronoun">'+esc(verbPronouns[p])+'</td><td>'+esc(forms[p])+'</td></tr>';
+                }
+                h+='</tbody></table></div>';
+            }
+            h+='</div>';
         }
-        h+='</div>';
     }
     el.innerHTML=h;
 }
 
 function verbSwitchTense(link){
     var v=link.getAttribute('data-verb'),t=link.getAttribute('data-tense');
-    // Toggle tabs
     var tabs=link.parentElement.parentElement.querySelectorAll('.nav-link');
     tabs.forEach(function(a){a.classList.remove('active')});
     link.classList.add('active');
-    // Toggle panels
     var card=link.closest('.verb-card');
     card.querySelectorAll('.verb-tense-panel').forEach(function(p){p.style.display='none'});
     document.getElementById('vtp_'+v+'_'+t).style.display='';
 }
 
-// ── Verb Quiz ──
+// ── Verb Quiz (Multiple Choice) ──
 var vqQueue=[],vqIdx=0,vqScore=0,vqErrors=0,vqLocked=false;
 
-function verbStartQuiz(){
-    // Build quiz questions from verb data
-    vqQueue=[];
+function verbBuildQuestions(){
+    var qq=[];
     var allTenses=['Presente','Pretérito','Imperfecto','Futuro'];
     for(var v=0;v<verbData.length;v++){
         var vb=verbData[v];
@@ -851,20 +947,25 @@ function verbStartQuiz(){
             var tense=allTenses[ti];
             if(!vb.tenses[tense])continue;
             var pIdx=Math.floor(Math.random()*verbPronouns.length);
-            vqQueue.push({
+            qq.push({
                 verb:vb.verb,
-                meaning:vb.meaning,
+                meaning:getVerbMeaning(vb),
                 tense:tense,
                 pronoun:verbPronouns[pIdx],
                 correct:vb.tenses[tense][pIdx],
-                pIdx:pIdx
+                pIdx:pIdx,
+                vIdx:v
             });
         }
     }
     // Shuffle
-    for(var i=vqQueue.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=vqQueue[i];vqQueue[i]=vqQueue[j];vqQueue[j]=t;}
-    // Limit to 20 questions for a manageable quiz
-    if(vqQueue.length>20)vqQueue=vqQueue.slice(0,20);
+    for(var i=qq.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=qq[i];qq[i]=qq[j];qq[j]=t;}
+    if(qq.length>20)qq=qq.slice(0,20);
+    return qq;
+}
+
+function verbStartQuiz(){
+    vqQueue=verbBuildQuestions();
     vqIdx=0;vqScore=0;vqErrors=0;vqLocked=false;
     document.getElementById('vqDone').style.display='none';
     document.getElementById('vqBody').style.display='';
@@ -883,24 +984,38 @@ function vqRender(){
     document.getElementById('vqPrompt').textContent=q.pronoun+' _____ ('+q.verb+')';
     document.getElementById('vqHint').textContent=q.meaning;
 
-    // Build 4 options: correct + 3 wrong
+    // Build 4 options from SAME verb (different pronouns/tenses) so it's not obvious
     var opts=[q.correct];
-    var pool=[];
-    for(var v=0;v<verbData.length;v++){
-        var vb=verbData[v];
-        if(vb.tenses[q.tense]){
-            for(var p=0;p<verbPronouns.length;p++){
-                var f=vb.tenses[q.tense][p];
-                if(f!==q.correct)pool.push(f);
-            }
+    var sameVerbPool=[];
+    var vb=verbData[q.vIdx];
+    var tenseKeys=Object.keys(vb.tenses);
+    for(var ti=0;ti<tenseKeys.length;ti++){
+        var forms=vb.tenses[tenseKeys[ti]];
+        for(var p=0;p<forms.length;p++){
+            if(forms[p]!==q.correct)sameVerbPool.push(forms[p]);
         }
     }
-    // Deduplicate and shuffle pool
-    var unique={};var upool=[];
-    for(var i=0;i<pool.length;i++){if(!unique[pool[i]]){unique[pool[i]]=true;upool.push(pool[i]);}}
+    // Deduplicate
+    var unique={};unique[q.correct]=true;var upool=[];
+    for(var i=0;i<sameVerbPool.length;i++){if(!unique[sameVerbPool[i]]){unique[sameVerbPool[i]]=true;upool.push(sameVerbPool[i]);}}
+    // Shuffle
     for(var i=upool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=upool[i];upool[i]=upool[j];upool[j]=t;}
     for(var i=0;i<upool.length&&opts.length<4;i++)opts.push(upool[i]);
-
+    // If not enough from same verb, add from other verbs
+    if(opts.length<4){
+        var fallback=[];
+        for(var v=0;v<verbData.length;v++){
+            if(v===q.vIdx)continue;
+            if(verbData[v].tenses[q.tense]){
+                for(var p=0;p<verbPronouns.length;p++){
+                    var f=verbData[v].tenses[q.tense][p];
+                    if(!unique[f]){unique[f]=true;fallback.push(f);}
+                }
+            }
+        }
+        for(var i=fallback.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=fallback[i];fallback[i]=fallback[j];fallback[j]=t;}
+        for(var i=0;i<fallback.length&&opts.length<4;i++)opts.push(fallback[i]);
+    }
     // Shuffle options
     for(var i=opts.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=opts[i];opts[i]=opts[j];opts[j]=t;}
 
@@ -941,6 +1056,85 @@ function vqFinish(){
     var msg=pct>=80?'Excelente!':pct>=60?'Buen trabajo.':'Sigue practicando.';
     document.getElementById('vqFinalMsg').textContent=msg;
 }
+
+// ── Fill-in Mode (Typing) ──
+var vfQueue=[],vfIdx=0,vfScore=0,vfErrors=0,vfLocked=false;
+
+function verbStartFill(){
+    vfQueue=verbBuildQuestions();
+    vfIdx=0;vfScore=0;vfErrors=0;vfLocked=false;
+    document.getElementById('vfDone').style.display='none';
+    document.getElementById('vfBody').style.display='';
+    document.getElementById('vfFeedback').innerHTML='';
+    vfRender();
+}
+
+function vfRender(){
+    if(vfIdx>=vfQueue.length){vfFinish();return;}
+    vfLocked=false;
+    var q=vfQueue[vfIdx];
+    document.getElementById('vfCorrect').textContent=vfScore+' correctas';
+    document.getElementById('vfWrong').textContent=vfErrors+' errores';
+    document.getElementById('vfProgress').textContent=(vfIdx+1)+'/'+vfQueue.length;
+    document.getElementById('vfBar').style.width=Math.round(vfIdx/vfQueue.length*100)+'%';
+    document.getElementById('vfTense').textContent=q.tense;
+    document.getElementById('vfPrompt').textContent=q.pronoun+' _____ ('+q.verb+')';
+    document.getElementById('vfHint').textContent=q.meaning;
+    document.getElementById('vfFeedback').innerHTML='';
+    var inp=document.getElementById('vfInput');
+    inp.value='';inp.disabled=false;inp.focus();
+    document.getElementById('vfSubmit').disabled=false;
+}
+
+function vfCheck(){
+    if(vfLocked)return;
+    var inp=document.getElementById('vfInput');
+    var answer=inp.value.trim().toLowerCase();
+    if(!answer)return;
+    vfLocked=true;
+    inp.disabled=true;
+    document.getElementById('vfSubmit').disabled=true;
+    var q=vfQueue[vfIdx];
+    var correct=q.correct.toLowerCase();
+    var fb=document.getElementById('vfFeedback');
+    if(answer===correct){
+        vfScore++;
+        fb.innerHTML='<span class="text-success fw-bold"><i class="fas fa-check me-1"></i>Correcto!</span>';
+    } else {
+        vfErrors++;
+        fb.innerHTML='<span class="text-danger fw-bold"><i class="fas fa-times me-1"></i>Incorrecto.</span> <span class="text-muted">Respuesta: <strong class="text-success">'+esc(q.correct)+'</strong></span>';
+    }
+    document.getElementById('vfCorrect').textContent=vfScore+' correctas';
+    document.getElementById('vfWrong').textContent=vfErrors+' errores';
+    vfIdx++;
+    setTimeout(vfRender,1200);
+}
+
+function vfInsert(ch){
+    var inp=document.getElementById('vfInput');
+    if(inp.disabled)return;
+    var start=inp.selectionStart,end=inp.selectionEnd;
+    inp.value=inp.value.substring(0,start)+ch+inp.value.substring(end);
+    inp.selectionStart=inp.selectionEnd=start+ch.length;
+    inp.focus();
+}
+
+function vfFinish(){
+    document.getElementById('vfBody').style.display='none';
+    document.getElementById('vfDone').style.display='';
+    document.getElementById('vfBar').style.width='100%';
+    var pct=vfQueue.length>0?Math.round(vfScore/vfQueue.length*100):0;
+    document.getElementById('vfFinalScore').textContent=vfScore+'/'+vfQueue.length+' ('+pct+'%)';
+    var msg=pct>=80?'Excelente!':pct>=60?'Buen trabajo.':'Sigue practicando.';
+    document.getElementById('vfFinalMsg').textContent=msg;
+}
+
+// Enter key submits fill-in
+document.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&document.getElementById('verbFill').style.display!=='none'&&!vfLocked){
+        vfCheck();
+    }
+});
 
 document.addEventListener('DOMContentLoaded',init);
 </script>
